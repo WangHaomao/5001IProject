@@ -56,15 +56,15 @@ def build_model():
                 optimizer=optimizer,
                 metrics=['mae'])
     return model
-# def build_model():
-#   model = keras.Sequential([
-#     keras.layers.Dense(64, activation=tf.nn.relu,
-#                        input_shape=(train_data.shape[1],)),
-#     keras.layers.Dense(64, activation=tf.nn.relu),
-#     # keras.layers.Dense(64, activation=tf.nn.relu),
-#     # keras.layers.Dense(64, activation=tf.nn.relu),
-#     keras.layers.Dense(1)
-#   ])
+def build_model():
+  model = keras.Sequential([
+    keras.layers.Dense(64, activation=tf.nn.relu,
+                       input_shape=(train_data.shape[1],)),
+    keras.layers.Dense(64, activation=tf.nn.relu),
+    # keras.layers.Dense(64, activation=tf.nn.relu),
+    # keras.layers.Dense(64, activation=tf.nn.relu),
+    keras.layers.Dense(1)
+  ])
 
   # optimizer = tf.train.RMSPropOptimizer(0.001)
   #
