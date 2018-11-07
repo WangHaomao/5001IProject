@@ -6,6 +6,7 @@ import numpy as np
 from scipy.stats import norm
 from sklearn.preprocessing import StandardScaler
 import warnings
+from sklearn.ensemble import IsolationForest
 warnings.filterwarnings('ignore')
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -145,13 +146,67 @@ def get_EngineeriedData():
 
 # get_EngineeriedData()
 def get_data():
-    a = ['penalty', 'l1_ratio', 'alpha', 'max_iter', 'random_state', 'n_jobs',
-     'n_samples', 'n_features', 'n_classes', 'n_clusters_per_class',
-     'n_informative', 'flip_y', 'scale', 'time']
-    selected_features = ['penalty','time', 'n_samples', 'max_iter',
+    # a = ['penalty', 'l1_ratio', 'alpha', 'max_iter', 'random_state', 'n_jobs',
+    #  'n_samples', 'n_features', 'n_classes', 'n_clusters_per_class',
+    #  'n_informative', 'flip_y', 'scale', 'time']
+
+    selected_features_without_label = ['penalty','time', 'n_samples', 'max_iter',
                          'n_features', 'n_classes', 'flip_y', 'n_informative',
                          'n_jobs','n_clusters_per_class']
 
-    df_train = pd.read_csv('data/train_csv')
-    df_train = df_train[selected_features]
-    saleprice_scaled = StandardScaler().fit_transform(df_train['SalePrice'][:, np.newaxis])
+    selected_features_with_label = selected_features_without_label.copy()
+    selected_features_without_label.remove('time')
+
+    df_train = pd.read_csv('data/train.csv')
+    df_train = df_train[selected_features_with_label]
+
+
+    train_numerical = df_train.select_dtypes(exclude=['object'])
+    columns_numerical_no_label = list(train_numerical.columns)
+    columns_numerical_no_label.remove('time')
+    train_numerical.fillna(0, inplace=True)
+    train_categoric = df_train.select_dtypes(include=['object'])
+    train_categoric.fillna('NONE', inplace=True)
+
+    clf = IsolationForest(max_samples=100, random_state=42)
+    clf.fit(pd.get_dummies(train_numerical))
+    y_noano = clf.predict(train_numerical)
+    y_noano = pd.DataFrame(y_noano, columns=['Top'])
+    # print(y_noano[y_noano['Top'] == 1].index.values)
+
+    train_numerical = train_numerical.iloc[y_noano[y_noano['Top'] == 1].index.values]
+    train_numerical.reset_index(drop=True, inplace=True)
+    print(len(train_numerical))
+    train_categoric = train_categoric.iloc[y_noano[y_noano['Top'] == 1].index.values]
+    train_categoric.reset_index(drop=True, inplace=True)
+
+    df_train = df_train.iloc[y_noano[y_noano['Top'] == 1].index.values]
+    df_train.reset_index(drop=True, inplace=True)
+
+    mean = train_numerical[columns_numerical_no_label].mean(axis=0)
+    std = train_numerical[columns_numerical_no_label].std(axis=0)
+
+    train_numerical[columns_numerical_no_label] = (train_numerical[columns_numerical_no_label] - mean) / std
+    train_categoric = pd.get_dummies(train_categoric)
+    train_numerical[['time']] = np.log(train_numerical[['time']])
+
+
+    """Test Dataset"""
+    df_test = pd.read_csv('data/test.csv')
+    df_test = df_test[selected_features_without_label]
+    test_numerical = df_test.select_dtypes(exclude=['object'])
+    test_numerical.fillna(0, inplace=True)
+    test_categoric = df_test.select_dtypes(include=['object'])
+    test_categoric.fillna('NONE', inplace=True)
+
+    test_numerical[columns_numerical_no_label] = (test_numerical[columns_numerical_no_label] - mean) / std
+    test_categoric = pd.get_dummies(test_categoric)
+
+    test_data = test_numerical.merge(test_categoric,left_index=True, right_index=True)
+    train_data = train_numerical.merge(train_categoric,left_index=True, right_index=True)
+
+    return train_data,test_data
+
+
+
+get_data()

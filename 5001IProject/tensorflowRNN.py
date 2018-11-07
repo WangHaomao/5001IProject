@@ -18,13 +18,13 @@ train = pd.read_csv('data/train.csv')
 selected_features = ['penalty','time', 'n_samples', 'max_iter',
                          'n_features', 'n_classes', 'flip_y', 'n_informative',
                          'n_jobs','n_clusters_per_class']
+
 test_selected_feratures= ['penalty', 'n_samples', 'max_iter',
                          'n_features', 'n_classes', 'flip_y', 'n_informative',
                          'n_jobs','n_clusters_per_class']
 
 train.drop('id',axis = 1, inplace = True)
 train = train[selected_features]
-
 train_numerical = train.select_dtypes(exclude=['object'])
 train_numerical.fillna(0,inplace = True)
 train_categoric = train.select_dtypes(include=['object'])
@@ -35,6 +35,8 @@ test = pd.read_csv('data/test.csv')
 ID = test.id
 test.drop('id',axis = 1, inplace = True)
 test = test[test_selected_feratures]
+
+
 
 test_numerical = test.select_dtypes(exclude=['object'])
 test_numerical.fillna(0,inplace = True)
@@ -186,7 +188,7 @@ def to_submit(pred_y,name_out):
     y_predict.to_csv('data/' + name_out + '.csv',index=False)
 #
 #
-to_submit(y_predict, "submission_cont_categ1102")
+to_submit(y_predict, "submission_cont_categ1102-2")
 # "" \
 # "DNN" \
 # # Model DNN

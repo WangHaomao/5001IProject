@@ -159,5 +159,3 @@ if __name__ == '__main__':
     # predictor.cross_validation()
     # predict(train_data)
     predictor.ensemble_predict()
-
-

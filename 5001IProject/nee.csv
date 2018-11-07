@@ -1,2 +1,0 @@
-l1_ratio,alpha,max_iter,random_state,n_jobs,n_samples,n_features,n_classes,n_clusters_per_class,n_informative,flip_y,scale,penalty_elasticnet,penalty_l1,penalty_l2,penalty_none
-0.435037116,0.01,886,342,1,963,537,9,2,11,0.078279086,74.2089876,1,0,0,0
